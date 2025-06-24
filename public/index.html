@@ -104,7 +104,7 @@
             <ul>
               <li><strong>Score:</strong> ${data.scamalytics.scamalytics.scamalytics_score} / 100 (${data.scamalytics.scamalytics.scamalytics_risk})</li>
               <li><strong>Proxy:</strong> <span class="${data.scamalytics.external_datasources.firehol.is_proxy ? 'yes' : 'no'}">${data.scamalytics.external_datasources.firehol.is_proxy ? 'Yes' : 'No'}</span></li>
-              <li><strong>VPN:</strong> <span class="${data.scamalytics.external_datasources.ip2proxy.proxy_type ? 'VPN' : ''}">${data.scamalytics.external_datasources.ip2proxy.proxy_type ? 'Yes' : 'No'}</span></li>
+              <li><strong>VPN Type:</strong> ${data.scamalytics.external_datasources.ip2proxy.proxy_type}</li>
               <li><strong>Datacenter:</strong> <span class="${data.scamalytics.scamalytics.scamalytics_proxy.is_datacenter ? 'yes' : 'no'}">${data.scamalytics.scamalytics.scamalytics_proxy.is_datacenter ? 'Yes' : 'No'}</span></li>
               <li><strong>Blacklisted:</strong> <span class="${data.scamalytics.scamalytics.is_blacklisted_external ? 'yes' : 'no'}">${data.scamalytics.scamalytics.is_blacklisted_external ? 'Yes' : 'No'}</span></li>
             </ul>  
