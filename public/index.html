@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IP Reputation Checker</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    input[type="text"] { padding: 10px; width: 300px; margin-right: 10px; font-size: 16px; }
+    button { padding: 10px 20px; font-size: 16px; }
+    .result { margin-top: 20px; }
+    .service-result { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+    h3 { margin: 0; }
+    h2 { font-family: Arial; margin: 0; font-size: 30px; }
+    .yes { color: red; font-weight: bold; }
+    .no { color: green; font-weight: bold;}
+    .zero { color: green; font-weight: bold;}
+    .VPN { color: red; font-weight: bold; }
+    ul { list-style-type: none; }
+  </style>
+</head>
+<body>
+  <h1>IP Reputation Checker</h1>
+  <input type="text" id="ipInput" placeholder="e.g. 109.81.169.160" />
+  <button onclick="checkIP()">Check</button>
+
+  <div id="results" class="result"></div>
+
+  <script>
+    async function checkIP() {
+      const ip = document.getElementById('ipInput').value.trim();
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = 'Loading...';
+
+      try {
+        const response = await fetch(`/check-ip?ip=${ip}`);
+        const data = await response.json();
+
+        if (data.error) {
+          resultsDiv.innerHTML = `<p style="color:red;">${data.error}</p>`;
+          return;
+        }
+
+        resultsDiv.innerHTML = `
+          <div class="service-result">
+            <h3>IP Details</h3>
+            <ul>
+              <li><strong>IP Address:</strong> ${data.abuseipdb.data.ipAddress}</li>
+              <li><strong>Country:</strong> ${data.ipqualityscore.country_code}</li>
+              <li><strong>Region:</strong> ${data.ipqualityscore.region}</li>
+              <li><strong>City:</strong> ${data.ipqualityscore.city}</li>
+              <li><strong>Host:</strong> ${data.ipqualityscore.host}</li>
+              <li><strong>Domain:</strong> ${data.abuseipdb.data.domain}</li>
+              <li><strong>ISP:</strong> ${data.abuseipdb.data.isp}</li>
+            </ul>  
+          </div>
+
+          <div class="service-result">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/VirusTotal_logo.svg/2560px-VirusTotal_logo.svg.png" width="227" height="44">
+            <ul>
+                <li><strong style="color:red;">Malicious:</strong> ${data.virustotal.data.attributes.last_analysis_stats.malicious}</li>
+                <li><strong style="color:orange;">Suspicious:</strong> ${data.virustotal.data.attributes.last_analysis_stats.suspicious}</li>
+                <li><strong style="color:blue;">Undetected:</strong> ${data.virustotal.data.attributes.last_analysis_stats.undetected}</li>
+                <li><strong style="color:green;">Harmless:</strong> ${data.virustotal.data.attributes.last_analysis_stats.harmless}</li>
+                <li><strong style="color:gray;">Timeout:</strong> ${data.virustotal.data.attributes.last_analysis_stats.timeout}</li>
+            </ul>
+
+          </div>
+
+          <div class="service-result">
+            <img src="https://www.abuseipdb.com/img/abuseipdb.png" width="200" height="44">
+            <ul>
+              <li><strong>Abuse Confidence Score:</strong> ${data.abuseipdb.data.abuseConfidenceScore} / 100</li>
+              <li><strong>Is Tor:</strong> <span class="${data.abuseipdb.data.isTor ? 'yes' : 'no'}">${data.abuseipdb.data.isTor ? 'Yes' : 'No'}</span></li>
+              <li><strong>Total Reports:</strong> ${data.abuseipdb.data.totalReports}</li>
+              <li><strong>Last Reported:</strong> ${data.abuseipdb.data.lastReportedAt ?? 'Never'}</li>
+            </ul>
+          </div>
+
+          <div class="service-result">
+            <img src="https://threatconnect.com/wp-content/uploads/2022/11/IPQS-logo.webp" width="235" height="44">
+            <ul>
+                <li><strong>Fraud Score:</strong> ${data.ipqualityscore.fraud_score}</li>
+                <li><strong>Proxy:</strong> <span class="${data.ipqualityscore.proxy ? 'yes' : 'no'}">${data.ipqualityscore.proxy ? 'Yes' : 'No'}</span></li>
+                <li><strong>VPN:</strong> <span class="${data.ipqualityscore.vpn ? 'yes' : 'no'}">${data.ipqualityscore.vpn ? 'Yes' : 'No'}</span></li>
+                <li><strong>TOR:</strong> <span class="${data.ipqualityscore.tor ? 'yes' : 'no'}">${data.ipqualityscore.tor ? 'Yes' : 'No'}</span></li>
+                <li><strong>Bot:</strong> <span class="${data.ipqualityscore.bot_status ? 'yes' : 'no'}">${data.ipqualityscore.bot_status ? 'Yes' : 'No'}</span></li>
+                <li><strong>Mobile:</strong> <span class="${data.ipqualityscore.mobile ? 'yes' : 'no'}">${data.ipqualityscore.mobile ? 'Yes' : 'No'}</span></li>
+            </ul>
+          </div>
+
+          <div class="service-result">
+            <h2>VPNAPI.io</h2>
+            <ul>
+              <li><strong>Proxy:</strong> <span class="${data.vpnapiio.security.proxy ? 'yes' : 'no'}">${data.vpnapiio.security.proxy ? 'Yes' : 'No'}</span></li>
+              <li><strong>VPN:</strong> <span class="${data.vpnapiio.security.vpn ? 'yes' : 'no'}">${data.vpnapiio.security.vpn ? 'Yes' : 'No'}</span></li>
+              <li><strong>TOR:</strong> <span class="${data.vpnapiio.security.tor ? 'yes' : 'no'}">${data.vpnapiio.security.tor ? 'Yes' : 'No'}</span></li>
+              <li><strong>Relay:</strong> <span class="${data.vpnapiio.security.relay ? 'yes' : 'no'}">${data.vpnapiio.security.relay ? 'Yes' : 'No'}</span></li>
+            </ul>
+          </div>
+
+          <div class="service-result">
+            <img src="https://scamalytics.com/wp-content/uploads/2016/09/Scamalytics_Logo_horizontal_no_background_no_strapline-1024x226.png" width="200" height="44">
+            <ul>
+              <li><strong>Score:</strong> ${data.scamalytics.scamalytics.scamalytics_score} / 100 (${data.scamalytics.scamalytics.scamalytics_risk})</li>
+              <li><strong>Proxy:</strong> <span class="${data.scamalytics.external_datasources.firehol.is_proxy ? 'yes' : 'no'}">${data.scamalytics.external_datasources.firehol.is_proxy ? 'Yes' : 'No'}</span></li>
+              <li><strong>VPN:</strong> <span class="${data.scamalytics.external_datasources.ip2proxy.proxy_type ? 'VPN' : ''}">${data.scamalytics.external_datasources.ip2proxy.proxy_type ? 'Yes' : 'No'}</span></li>
+              <li><strong>Datacenter:</strong> <span class="${data.scamalytics.scamalytics.scamalytics_proxy.is_datacenter ? 'yes' : 'no'}">${data.scamalytics.scamalytics.scamalytics_proxy.is_datacenter ? 'Yes' : 'No'}</span></li>
+              <li><strong>Blacklisted:</strong> <span class="${data.scamalytics.scamalytics.is_blacklisted_external ? 'yes' : 'no'}">${data.scamalytics.scamalytics.is_blacklisted_external ? 'Yes' : 'No'}</span></li>
+            </ul>  
+          </div> 
+        `;
+      } catch (err) {
+        console.error(err);
+        resultsDiv.innerHTML = `<p style="color:red;">Error checking IP reputation</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
