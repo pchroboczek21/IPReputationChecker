@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IP Reputation Checker</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    input[type="text"] { padding: 10px; width: 300px; margin-right: 10px; font-size: 16px; }
+    button { padding: 10px 20px; font-size: 16px; }
+    .result { margin-top: 20px; }
+    .service-result { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+    h3 { margin: 0; }
+  </style>
+</head>
+<body>
+  <h1>IP Reputation Checker</h1>
+  <input type="text" id="ipInput" placeholder="e.g. 109.81.169.160" />
+  <button onclick="checkIP()">Check</button>
+
+  <div id="results" class="result"></div>
+
+  <script>
+    async function checkIP() {
+      const ip = document.getElementById('ipInput').value.trim();
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = 'Loading...';
+
+      try {
+        const response = await fetch(`/check-ip?ip=${ip}`);
+        const data = await response.json();
+
+        if (data.error) {
+          resultsDiv.innerHTML = `<p style="color:red;">${data.error}</p>`;
+          return;
+        }
+
+        resultsDiv.innerHTML = `
+          <div class="service-result">
+            <h3>VirusTotal</h3>
+            <pre>${JSON.stringify(data.virustotal.data.attributes.last_analysis_stats, null, 2)}</pre>
+          </div>
+          <div class="service-result">
+            <h3>AbuseIPDB</h3>
+            <pre>${JSON.stringify(data.abuseipdb.data, null, 2)}</pre>
+          </div>
+          <div class="service-result">
+            <h3>IPQualityScore</h3>
+            <pre>${JSON.stringify(data.ipqualityscore, null, 2)}</pre>
+          </div>
+        `;
+      } catch (err) {
+        console.error(err);
+        resultsDiv.innerHTML = `<p style="color:red;">Error checking IP reputation</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
