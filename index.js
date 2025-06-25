@@ -22,8 +22,8 @@ app.use(express.static('public'));
 
 app.get('/check-ip', async (req, res) => {
   const ip = req.query.ip;
-  if (!ip || !/^\d{1,3}(\.\d{1,3}){3}$/.test(ip)) {
-    return res.status(400).json({ error: 'Invalid IP address' });
+  if (!ip || ip.trim() === '') {
+    return res.status(400).json({ error: 'IP address is required' });
   }
 
   try {
